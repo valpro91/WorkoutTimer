@@ -18,7 +18,7 @@
 		C01056BE2BE9C66F00A99A94 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = C01056BD2BE9C66F00A99A94 /* FirebaseInstallations */; };
 		C01056C02BE9C66F00A99A94 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = C01056BF2BE9C66F00A99A94 /* FirebasePerformance */; };
 		C01056C22BE9C66F00A99A94 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C01056C12BE9C66F00A99A94 /* FirebaseStorage */; };
-		C01056C42BE9CCA400A99A94 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C01056C32BE9CCA400A99A94 /* GoogleService-Info.plist */; };
+		C01056C62BE9CDFE00A99A94 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C01056C52BE9CDFE00A99A94 /* GoogleService-Info.plist */; };
 		C0603A562BDECB4600E483B9 /* Workout_TimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0603A552BDECB4600E483B9 /* Workout_TimerApp.swift */; };
 		C0603A582BDECB4600E483B9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0603A572BDECB4600E483B9 /* ContentView.swift */; };
 		C0603A5A2BDECB4700E483B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0603A592BDECB4700E483B9 /* Assets.xcassets */; };
@@ -49,7 +49,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		C01056C32BE9CCA400A99A94 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		C01056C52BE9CDFE00A99A94 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C0603A522BDECB4600E483B9 /* Workout Timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Workout Timer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0603A552BDECB4600E483B9 /* Workout_TimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout_TimerApp.swift; sourceTree = "<group>"; };
 		C0603A572BDECB4600E483B9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -130,7 +130,7 @@
 				C08E5B372BE2C65200E474E1 /* Sounds */,
 				C0603A5B2BDECB4700E483B9 /* Preview Content */,
 				C08E5B382BE323EB00E474E1 /* Exercise_editor.swift */,
-				C01056C32BE9CCA400A99A94 /* GoogleService-Info.plist */,
+				C01056C52BE9CDFE00A99A94 /* GoogleService-Info.plist */,
 			);
 			path = "Workout Timer";
 			sourceTree = "<group>";
@@ -291,7 +291,7 @@
 			files = (
 				C0603A5D2BDECB4700E483B9 /* Preview Assets.xcassets in Resources */,
 				C08E5B362BE2C63200E474E1 /* pause.mp3 in Resources */,
-				C01056C42BE9CCA400A99A94 /* GoogleService-Info.plist in Resources */,
+				C01056C62BE9CDFE00A99A94 /* GoogleService-Info.plist in Resources */,
 				C08E5B352BE2C63200E474E1 /* start.mp3 in Resources */,
 				C0603A5A2BDECB4700E483B9 /* Assets.xcassets in Resources */,
 			);
