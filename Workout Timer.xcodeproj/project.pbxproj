@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C006CA7E2BE9C4890058D06D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C006CA7D2BE9C4890058D06D /* GoogleService-Info.plist */; };
+		C006CA7F2BE9C4890058D06D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C006CA7D2BE9C4890058D06D /* GoogleService-Info.plist */; };
+		C006CA802BE9C4890058D06D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C006CA7D2BE9C4890058D06D /* GoogleService-Info.plist */; };
+		C01056AE2BE9C66F00A99A94 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C01056AD2BE9C66F00A99A94 /* FirebaseAnalytics */; };
+		C01056B02BE9C66F00A99A94 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = C01056AF2BE9C66F00A99A94 /* FirebaseAppCheck */; };
+		C01056B22BE9C66F00A99A94 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = C01056B12BE9C66F00A99A94 /* FirebaseAuth */; };
+		C01056B42BE9C66F00A99A94 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C01056B32BE9C66F00A99A94 /* FirebaseCrashlytics */; };
+		C01056B62BE9C66F00A99A94 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = C01056B52BE9C66F00A99A94 /* FirebaseDatabase */; };
+		C01056B82BE9C66F00A99A94 /* FirebaseDatabaseSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C01056B72BE9C66F00A99A94 /* FirebaseDatabaseSwift */; };
+		C01056BA2BE9C66F00A99A94 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C01056B92BE9C66F00A99A94 /* FirebaseFirestore */; };
+		C01056BC2BE9C66F00A99A94 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C01056BB2BE9C66F00A99A94 /* FirebaseFirestoreSwift */; };
+		C01056BE2BE9C66F00A99A94 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = C01056BD2BE9C66F00A99A94 /* FirebaseInstallations */; };
+		C01056C02BE9C66F00A99A94 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = C01056BF2BE9C66F00A99A94 /* FirebasePerformance */; };
+		C01056C22BE9C66F00A99A94 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C01056C12BE9C66F00A99A94 /* FirebaseStorage */; };
 		C0603A562BDECB4600E483B9 /* Workout_TimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0603A552BDECB4600E483B9 /* Workout_TimerApp.swift */; };
 		C0603A582BDECB4600E483B9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0603A572BDECB4600E483B9 /* ContentView.swift */; };
 		C0603A5A2BDECB4700E483B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0603A592BDECB4700E483B9 /* Assets.xcassets */; };
@@ -14,6 +28,9 @@
 		C0603A672BDECB4700E483B9 /* Workout_TimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0603A662BDECB4700E483B9 /* Workout_TimerTests.swift */; };
 		C0603A712BDECB4700E483B9 /* Workout_TimerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0603A702BDECB4700E483B9 /* Workout_TimerUITests.swift */; };
 		C0603A732BDECB4700E483B9 /* Workout_TimerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0603A722BDECB4700E483B9 /* Workout_TimerUITestsLaunchTests.swift */; };
+		C08E5B352BE2C63200E474E1 /* start.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C08E5B332BE2C63200E474E1 /* start.mp3 */; };
+		C08E5B362BE2C63200E474E1 /* pause.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C08E5B342BE2C63200E474E1 /* pause.mp3 */; };
+		C08E5B392BE323EB00E474E1 /* Exercise_editor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08E5B382BE323EB00E474E1 /* Exercise_editor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +51,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C006CA7D2BE9C4890058D06D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C0603A522BDECB4600E483B9 /* Workout Timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Workout Timer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0603A552BDECB4600E483B9 /* Workout_TimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout_TimerApp.swift; sourceTree = "<group>"; };
 		C0603A572BDECB4600E483B9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,6 +62,9 @@
 		C0603A6C2BDECB4700E483B9 /* Workout TimerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Workout TimerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0603A702BDECB4700E483B9 /* Workout_TimerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout_TimerUITests.swift; sourceTree = "<group>"; };
 		C0603A722BDECB4700E483B9 /* Workout_TimerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout_TimerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C08E5B332BE2C63200E474E1 /* start.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start.mp3; sourceTree = "<group>"; };
+		C08E5B342BE2C63200E474E1 /* pause.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = pause.mp3; sourceTree = "<group>"; };
+		C08E5B382BE323EB00E474E1 /* Exercise_editor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise_editor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +72,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C01056B82BE9C66F00A99A94 /* FirebaseDatabaseSwift in Frameworks */,
+				C01056B62BE9C66F00A99A94 /* FirebaseDatabase in Frameworks */,
+				C01056C02BE9C66F00A99A94 /* FirebasePerformance in Frameworks */,
+				C01056B02BE9C66F00A99A94 /* FirebaseAppCheck in Frameworks */,
+				C01056BE2BE9C66F00A99A94 /* FirebaseInstallations in Frameworks */,
+				C01056B42BE9C66F00A99A94 /* FirebaseCrashlytics in Frameworks */,
+				C01056B22BE9C66F00A99A94 /* FirebaseAuth in Frameworks */,
+				C01056AE2BE9C66F00A99A94 /* FirebaseAnalytics in Frameworks */,
+				C01056C22BE9C66F00A99A94 /* FirebaseStorage in Frameworks */,
+				C01056BA2BE9C66F00A99A94 /* FirebaseFirestore in Frameworks */,
+				C01056BC2BE9C66F00A99A94 /* FirebaseFirestoreSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,7 +129,10 @@
 				C0603A552BDECB4600E483B9 /* Workout_TimerApp.swift */,
 				C0603A572BDECB4600E483B9 /* ContentView.swift */,
 				C0603A592BDECB4700E483B9 /* Assets.xcassets */,
+				C08E5B372BE2C65200E474E1 /* Sounds */,
 				C0603A5B2BDECB4700E483B9 /* Preview Content */,
+				C08E5B382BE323EB00E474E1 /* Exercise_editor.swift */,
+				C006CA7D2BE9C4890058D06D /* GoogleService-Info.plist */,
 			);
 			path = "Workout Timer";
 			sourceTree = "<group>";
@@ -127,6 +162,15 @@
 			path = "Workout TimerUITests";
 			sourceTree = "<group>";
 		};
+		C08E5B372BE2C65200E474E1 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				C08E5B342BE2C63200E474E1 /* pause.mp3 */,
+				C08E5B332BE2C63200E474E1 /* start.mp3 */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -143,6 +187,19 @@
 			dependencies = (
 			);
 			name = "Workout Timer";
+			packageProductDependencies = (
+				C01056AD2BE9C66F00A99A94 /* FirebaseAnalytics */,
+				C01056AF2BE9C66F00A99A94 /* FirebaseAppCheck */,
+				C01056B12BE9C66F00A99A94 /* FirebaseAuth */,
+				C01056B32BE9C66F00A99A94 /* FirebaseCrashlytics */,
+				C01056B52BE9C66F00A99A94 /* FirebaseDatabase */,
+				C01056B72BE9C66F00A99A94 /* FirebaseDatabaseSwift */,
+				C01056B92BE9C66F00A99A94 /* FirebaseFirestore */,
+				C01056BB2BE9C66F00A99A94 /* FirebaseFirestoreSwift */,
+				C01056BD2BE9C66F00A99A94 /* FirebaseInstallations */,
+				C01056BF2BE9C66F00A99A94 /* FirebasePerformance */,
+				C01056C12BE9C66F00A99A94 /* FirebaseStorage */,
+			);
 			productName = "Workout Timer";
 			productReference = C0603A522BDECB4600E483B9 /* Workout Timer.app */;
 			productType = "com.apple.product-type.application";
@@ -215,6 +272,9 @@
 				Base,
 			);
 			mainGroup = C0603A492BDECB4600E483B9;
+			packageReferences = (
+				C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = C0603A532BDECB4600E483B9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -232,6 +292,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0603A5D2BDECB4700E483B9 /* Preview Assets.xcassets in Resources */,
+				C08E5B362BE2C63200E474E1 /* pause.mp3 in Resources */,
+				C006CA7E2BE9C4890058D06D /* GoogleService-Info.plist in Resources */,
+				C08E5B352BE2C63200E474E1 /* start.mp3 in Resources */,
 				C0603A5A2BDECB4700E483B9 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -240,6 +303,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C006CA7F2BE9C4890058D06D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,6 +311,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C006CA802BE9C4890058D06D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +323,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0603A582BDECB4600E483B9 /* ContentView.swift in Sources */,
+				C08E5B392BE323EB00E474E1 /* Exercise_editor.swift in Sources */,
 				C0603A562BDECB4600E483B9 /* Workout_TimerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -422,8 +488,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Workout Timer/Preview Content\"";
+				DEVELOPMENT_TEAM = T62Y6FH8SR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WorkoutApp;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -450,8 +518,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Workout Timer/Preview Content\"";
+				DEVELOPMENT_TEAM = T62Y6FH8SR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WorkoutApp;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -582,6 +652,75 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.25.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C01056AD2BE9C66F00A99A94 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		C01056AF2BE9C66F00A99A94 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		C01056B12BE9C66F00A99A94 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		C01056B32BE9C66F00A99A94 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		C01056B52BE9C66F00A99A94 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		C01056B72BE9C66F00A99A94 /* FirebaseDatabaseSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabaseSwift;
+		};
+		C01056B92BE9C66F00A99A94 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		C01056BB2BE9C66F00A99A94 /* FirebaseFirestoreSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestoreSwift;
+		};
+		C01056BD2BE9C66F00A99A94 /* FirebaseInstallations */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseInstallations;
+		};
+		C01056BF2BE9C66F00A99A94 /* FirebasePerformance */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebasePerformance;
+		};
+		C01056C12BE9C66F00A99A94 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C006CA812BE9C57A0058D06D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C0603A4A2BDECB4600E483B9 /* Project object */;
 }
