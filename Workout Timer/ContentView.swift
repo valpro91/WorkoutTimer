@@ -173,29 +173,58 @@ struct WorkoutScreen: View {
     @State private var currentExercise = 0
     @State private var currentRound = 0
     @State private var timeRemaining = 0
+    @State private var timeLeft = 0
     
     @State private var localActiveTime = 0
     @State private var localPauseTime = 0
     @State private var localRounds = 0
+    
+    @State private var startWorkoutQueueItem: DispatchWorkItem?
+
 
     
     
     func startWorkout() {
-//        configureAudioSession() // Set up the audio session
-        timeRemaining = localActiveTime
+        
         isRunning = true
         isWorkoutActive = true
         
         // Announce the first exercise
-        let exerciseName = workout.exercises[currentExercise]
-        speak(text: "Starting \(exerciseName)")
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            playTone("start")
-            self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+        
+        startWorkoutQueueItem = DispatchWorkItem {
+                   playTone("start")
+                   self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                       self.handleTimerTick()
+                   }
+               }
+        
+        if timeLeft == 0 {
+            let exerciseName = workout.exercises[currentExercise]
+            speak(text: "Starting \(exerciseName)")
+            timeRemaining = localActiveTime
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: startWorkoutQueueItem!)
+        } else {
+            timeRemaining = timeLeft
+            timeLeft = 0
+            timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 handleTimerTick()
             }
+            
         }
+//        configureAudioSession() // Set up the audio session
+      
+       
+        
+
+        
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+//            playTone("start")
+//            self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+//                handleTimerTick()
+//            }
+//        }
+        
     }
     
     func handleTimerTick() {
@@ -263,11 +292,14 @@ struct WorkoutScreen: View {
     }
     
     func pauseWorkout() {
+        startWorkoutQueueItem?.cancel()
         isRunning = false
+        timeLeft = timeRemaining
         timer?.invalidate()
     }
 
     func resetWorkout() {
+        startWorkoutQueueItem?.cancel()
         timer?.invalidate()
         isRunning = false
         currentExercise = 0
