@@ -1,6 +1,7 @@
 import SwiftUI
 import AVFoundation
 import AVFAudio
+import UIKit // Required for UIApplication.shared
 
 
 struct Workout: Codable, Identifiable, Hashable {
@@ -185,7 +186,7 @@ struct WorkoutScreen: View {
     
     
     func startWorkout() {
-        
+        UIApplication.shared.isIdleTimerDisabled = true // Prevent sleep mode
         isRunning = true
         isWorkoutActive = true
         
@@ -299,6 +300,8 @@ struct WorkoutScreen: View {
     }
 
     func resetWorkout() {
+        UIApplication.shared.isIdleTimerDisabled = false // Prevent sleep mode
+
         startWorkoutQueueItem?.cancel()
         timer?.invalidate()
         isRunning = false
@@ -375,6 +378,11 @@ struct WorkoutScreen: View {
             configureAudioSession() // Call the function when the view appears
             setLocalTimes()
             
+                }
+        .onDisappear {
+                    if !isRunning {
+                        UIApplication.shared.isIdleTimerDisabled = false // Allow sleep mode
+                    }
                 }
     }
 }
