@@ -3,6 +3,10 @@ import AVFoundation
 import AVFAudio
 import UIKit // Required for UIApplication.shared
 
+import FirebaseFirestore
+import FirebaseFirestoreSwift
+
+
 
 struct Workout: Codable, Identifiable, Hashable {
     var id: UUID // This field will be used for hashing
@@ -21,6 +25,51 @@ struct Workout: Codable, Identifiable, Hashable {
         return lhs.id == rhs.id // Equality check based on `UUID`
     }
 }
+
+
+// Save a single workout to Firestore
+func saveWorkout(workout: Workout, completion: @escaping (Result<Void, Error>) -> Void) {
+    let db = Firestore.firestore()
+    do {
+        try db.collection("workouts").document(workout.id.uuidString).setData(from: workout) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
+        }
+    } catch {
+        completion(.failure(error))
+    }
+}
+
+// Load all workouts from Firestore
+func loadWorkouts(completion: @escaping (Result<[Workout], Error>) -> Void) {
+    let db = Firestore.firestore()
+    db.collection("workouts").getDocuments { querySnapshot, error in
+        if let error = error {
+            completion(.failure(error))
+        } else {
+            let workouts: [Workout] = querySnapshot?.documents.compactMap { doc in
+                try? doc.data(as: Workout.self)
+            } ?? []
+            completion(.success(workouts))
+        }
+    }
+}
+
+// Delete a workout from Firestore
+func deleteWorkout(workout: Workout, completion: @escaping (Result<Void, Error>) -> Void) {
+    let db = Firestore.firestore()
+    db.collection("workouts").document(workout.id.uuidString).delete { error in
+        if let error = error {
+            completion(.failure(error))
+        } else {
+            completion(.success(()))
+        }
+    }
+}
+
 
 // Define a custom SwiftUI cell to represent each workout in the list
 struct WorkoutCell: View {
@@ -50,28 +99,10 @@ struct WorkoutCell: View {
 }
 
 struct StartScreen: View {
-    @State private var workouts: [Workout] = [
-        Workout(
-            id: UUID(),
-            name: "Abs",
-            exercises: ["Situps", "Chair Reacher", "Elbows to Knees", "Obliques", "Kicks", "Side Hip Lifts", "Mountainclimbers", "Plank"],
-            activeTime: 45,
-            pauseTime: 15,
-            rounds: 1
-        ),
-        Workout(
-            id: UUID(),
-            name: "Back",
-            exercises: ["Reachers With Towel", "Supermans", "Reachers", "Lying Jumping Jacks", "Shoulder Lift"],
-            activeTime: 60,
-            pauseTime: 0,
-            rounds: 1
-        )
-    ]
-    
-
+    @State private var workouts: [Workout] = []
     @State private var selectedWorkout: Workout?
     @State private var showingEditScreen = false
+    @State private var errorMessage: String?
 
         var body: some View {
             NavigationView {
@@ -91,6 +122,16 @@ struct StartScreen: View {
                     EditWorkoutScreen(workout: .constant(workoutToEdit), isNewWorkout: false)
                     }
                 .navigationBarTitle("Workouts")
+                .onAppear(){
+                    loadWorkouts { result in
+                        switch result {
+                        case .success(let fetchedWorkouts):
+                            workouts = fetchedWorkouts
+                        case .failure(let error):
+                            errorMessage = error.localizedDescription
+                        }
+                    }
+                }
             }
         }
 }
@@ -157,7 +198,15 @@ struct EditWorkoutScreen: View {
                 }
             }
             Button("Save") {
-                dismiss() // Go back to the previous screen
+                saveWorkout(workout: workout) { result in
+                                    switch result {
+                                    case .success():
+                                        dismiss()
+                                    case .failure(let error):
+                                        print("Error saving workout:", error.localizedDescription)
+                                    }
+                                }
+//                dismiss() // Go back to the previous screen
             }
         }
         .padding()
@@ -213,25 +262,30 @@ struct WorkoutScreen: View {
             }
             
         }
-//        configureAudioSession() // Set up the audio session
-      
-       
-        
-
-        
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-//            playTone("start")
-//            self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-//                handleTimerTick()
-//            }
-//        }
-        
     }
+    
+    func speakCountdown(for seconds: Int, isActivePhase: Bool) {
+        let messages = isActivePhase ? [10:"10 Seconds left",
+                                        5: "5",
+                                        3: "3",
+                                        2: "2",
+                                        1: "1"]:[5: "5",
+                                                 3: "3",
+                                                 2: "2",
+                                                 1: "1"]
+        
+          if let message = messages[seconds] {
+              speak(text: message)
+          }
+      }
     
     func handleTimerTick() {
         if timeRemaining > 0 {
             timeRemaining -= 1
-        } else {
+    
+            speakCountdown(for: timeRemaining, isActivePhase: isWorkoutActive)
+            
+            } else {
             if isWorkoutActive {
                 isWorkoutActive = false
                 timeRemaining = localPauseTime
@@ -377,12 +431,9 @@ struct WorkoutScreen: View {
         .onAppear {
             configureAudioSession() // Call the function when the view appears
             setLocalTimes()
-            
                 }
         .onDisappear {
-                    if !isRunning {
-                        UIApplication.shared.isIdleTimerDisabled = false // Allow sleep mode
-                    }
+                resetWorkout()
                 }
     }
 }
