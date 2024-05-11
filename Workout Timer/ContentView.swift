@@ -8,13 +8,22 @@ import FirebaseFirestoreSwift
 
 
 
-struct Workout: Codable, Identifiable, Hashable {
+class Workout: Identifiable, Hashable, Equatable, Encodable, Decodable {
     var id: UUID // This field will be used for hashing
     var name: String
-    var exercises: [String]
+    var exercises: [String] = []
     var activeTime: Int
     var pauseTime: Int
     var rounds: Int
+    
+    init(id: UUID = UUID(), name: String, exercises: [String] = [], activeTime: Int, pauseTime: Int, rounds: Int) {
+        self.id = id
+        self.name = name
+        self.exercises = exercises
+        self.activeTime = activeTime
+        self.pauseTime = pauseTime
+        self.rounds = rounds
+    }
     
     // Implement the `Hashable` requirements
     func hash(into hasher: inout Hasher) {
@@ -116,13 +125,17 @@ struct StartScreen: View {
                             showingEditScreen = true
                         }
                     )
-                    
                 }
-                .sheet(item: $selectedWorkout) { workoutToEdit in // Use $selectedWorkout for binding
-                    EditWorkoutScreen(workout: .constant(workoutToEdit), isNewWorkout: false)
+                .sheet(isPresented: $showingEditScreen) {
+                    if let index = workouts.firstIndex(of: selectedWorkout ?? workouts[0]) {
+                        EditWorkoutScreen(workout: $workouts[index], isNewWorkout: false)
+                    } else {
+                        Text("Workout not found")
                     }
+                }
                 .navigationBarTitle("Workouts")
                 .onAppear(){
+                    print("Loading workouts")
                     loadWorkouts { result in
                         switch result {
                         case .success(let fetchedWorkouts):
@@ -141,63 +154,74 @@ struct EditWorkoutScreen: View {
     @Binding var workout: Workout
     let isNewWorkout: Bool
     @Environment(\.dismiss) var dismiss
-    
     @State private var exerciseToAdd = ""
     
     var body: some View {
         VStack {
             HStack {
-                Text("Name")
-                TextField("Workout Name", text: $workout.name)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                Text(workout.name)
+                    .font(.title)
             }
 
             HStack {
-                Text("Active Time")
-                TextField("Active Time", text: Binding(
-                    get: { String(workout.activeTime) },
-                    set: { workout.activeTime = Int($0) ?? 0 }
-                ))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-            }
-
-            HStack {
-                Text("Pause Time")
-                TextField("Pause Time", text: Binding(
-                    get: { String(workout.pauseTime) },
-                    set: { workout.pauseTime = Int($0) ?? 0 }
-                ))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                VStack{
+                    Text("Active Time")
+                    Picker("Active Time", selection: $workout.activeTime) {
+                        ForEach([15,30,45,60,75,90,120], id: \.self) { time in
+                            Text("\(time)").tag(time)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(height: 75)
+                    
+                }
+                
+                VStack{
+                    Text("Pause Time")
+                    Picker("Pause Time", selection: $workout.pauseTime){
+                        ForEach([0,5,10,15,30], id: \.self) { time in
+                            Text("\(time)").tag(time)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(height: 75)
+                }
+               
             }
 
             HStack {
                 Text("Rounds")
-                TextField("Rounds", text: Binding(
-                    get: { String(workout.rounds) },
-                    set: { workout.rounds = Int($0) ?? 0 }
-                ))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                Picker("Rounds", selection: $workout.rounds){
+                    ForEach([1,2,3,4,5], id: \.self) { rounds in
+                        Text("\(rounds)").tag(rounds)
+                    }
+                }
+                .pickerStyle(.segmented)
             }
 
             VStack {
                 Text("Exercises")
-                ForEach(workout.exercises.indices, id: \.self) { index in
-                    TextField("Exercise \(index + 1)", text: $workout.exercises[index])
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                }
+                               List {
+                                   ForEach(workout.exercises, id: \.self) { element in
+                                       Text(element)
+                                        }
+                                   }
+                               
 
-                HStack {
-                    TextField("Add Exercise", text: $exerciseToAdd)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    Button("Add") {
-                        if !exerciseToAdd.isEmpty {
-                            workout.exercises.append(exerciseToAdd)
-                            exerciseToAdd = ""
-                        }
-                    }
-                }
+                               HStack {
+                                   TextField("Add Exercise", text: $exerciseToAdd)
+                                       .textFieldStyle(RoundedBorderTextFieldStyle())
+                                   Button("Add") {
+                                       if !exerciseToAdd.isEmpty {
+                                           workout.exercises.append(exerciseToAdd)
+                                           exerciseToAdd = ""
+                                       }
+                                   }
+                               }
             }
+            
             Button("Save") {
+                
                 saveWorkout(workout: workout) { result in
                                     switch result {
                                     case .success():
@@ -206,7 +230,6 @@ struct EditWorkoutScreen: View {
                                         print("Error saving workout:", error.localizedDescription)
                                     }
                                 }
-//                dismiss() // Go back to the previous screen
             }
         }
         .padding()
@@ -378,7 +401,7 @@ struct WorkoutScreen: View {
         VStack {
             Text(workout.name).font(.largeTitle)
             Spacer()
-            HStack{
+            HStack {
                 VStack{
                     Text("Active Time")
                     Picker("Active Time", selection: $localActiveTime) {
@@ -387,7 +410,10 @@ struct WorkoutScreen: View {
                         }
                     }
                     .pickerStyle(.wheel)
+                    .frame(height: 125)
+                    
                 }
+                
                 VStack{
                     Text("Pause Time")
                     Picker("Pause Time", selection: $localPauseTime){
@@ -396,16 +422,20 @@ struct WorkoutScreen: View {
                         }
                     }
                     .pickerStyle(.wheel)
+                    .frame(height: 125)
                 }
-                VStack{
-                    Text("Rounds")
-                    Picker("Rounds", selection: $localRounds){
-                        ForEach(1...10, id: \.self) { time in
-                            Text("\(time)").tag(time)
-                        }
+               
+            }
+
+            HStack {
+                Text("Rounds")
+                Picker("Rounds", selection: $localRounds){
+                    ForEach([1,2,3,4,5], id: \.self) { rounds in
+                        Text("\(rounds)").tag(rounds)
                     }
-                    .pickerStyle(.wheel)
                 }
+                .pickerStyle(.segmented)
+                .padding()
             }
             
             Spacer()
