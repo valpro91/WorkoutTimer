@@ -107,35 +107,87 @@ struct WorkoutCell: View {
     }
 }
 
-struct StartScreen: View {
+struct WelcomeScreen: View {
+    
+    
+    var body: some View {
+        NavigationStack{
+            VStack{
+                Text("Hello World")
+                NavigationLink(destination: SetListScreen()) {  // <-- Move NavigationLink outside
+                    Text("Do Something")
+                                
+                              }
+            }
+        }
+    }
+}
+
+struct CreateWorkoutPlaylistScreen: View {
+    @State private var sets: [Workout] = []
+    @State private var errorMessage: String?
+
+    var body: some View {
+        VStack{
+            Text("Here you can create your Full Workout")
+        }
+        .onAppear(){
+            loadWorkouts { result in
+                switch result {
+                case .success(let fetchedWorkouts):
+                    sets = fetchedWorkouts
+                case .failure(let error):
+                    errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+       
+}
+
+
+struct SetListScreen: View {
     @State private var workouts: [Workout] = []
-    @State private var selectedWorkout: Workout?
+    @State private var selectedWorkout: Workout = Workout(name: "Default", activeTime: 1, pauseTime: 1, rounds: 1)
+    
     @State private var showingEditScreen = false
+    @State private var isNewWorkout = false
     @State private var errorMessage: String?
 
         var body: some View {
             NavigationView {
-                List(workouts) { workout in
-                    WorkoutCell(
-                        workout: workout,
-                        onEdit: {
+                VStack{
+                    List(workouts) { workout in
+                        WorkoutCell(
+                            workout: workout,
+                            onEdit: {
+                                
+                                selectedWorkout = workout // Store ID
+                                showingEditScreen = true
                             
-                            // Custom action for the edit button
-                            selectedWorkout = workout
-                            showingEditScreen = true
-                        }
-                    )
-                }
-                .sheet(isPresented: $showingEditScreen) {
-                    if let index = workouts.firstIndex(of: selectedWorkout ?? workouts[0]) {
-                        EditWorkoutScreen(workout: $workouts[index], isNewWorkout: false)
-                    } else {
-                        Text("Workout not found")
+                            }
+                        )
                     }
+                    .listStyle(.plain)
+                    .sheet(isPresented: $showingEditScreen) {
+                        
+                            EditWorkoutScreen(workout: $selectedWorkout, workouts: $workouts, isNewWorkout: $isNewWorkout)
+                     
+                    }
+                    
+                    Button("Add New Workout", systemImage: "plus.circle", action: {
+                        let newWorkout = Workout(name: "New Workout", activeTime: 0, pauseTime: 0, rounds: 0)
+                        workouts.append(newWorkout)
+                        selectedWorkout = newWorkout
+                        showingEditScreen = true
+                        isNewWorkout = true
+                    })
+                    .font(.largeTitle)
+                    .labelStyle(.iconOnly)
                 }
                 .navigationBarTitle("Workouts")
                 .onAppear(){
-                    print("Loading workouts")
+                    print("Loading")
                     loadWorkouts { result in
                         switch result {
                         case .success(let fetchedWorkouts):
@@ -152,17 +204,26 @@ struct StartScreen: View {
 
 struct EditWorkoutScreen: View {
     @Binding var workout: Workout
-    let isNewWorkout: Bool
+    @Binding var workouts: [Workout]
+    @Binding var isNewWorkout: Bool
+    @State private var savedNewWorkout: Bool = false
+    
     @Environment(\.dismiss) var dismiss
     @State private var exerciseToAdd = ""
+    @State private var renamingWorkout = false
+    
+    
     
     var body: some View {
         VStack {
             HStack {
-                Text(workout.name)
-                    .font(.title)
+                TextField(workout.name, text: $workout.name)
+                    .font(.largeTitle)
+                    .padding()
             }
-
+            
+            Spacer()
+            
             HStack {
                 VStack{
                     Text("Active Time")
@@ -186,9 +247,9 @@ struct EditWorkoutScreen: View {
                     .pickerStyle(.wheel)
                     .frame(height: 75)
                 }
-               
+                
             }
-
+            
             HStack {
                 Text("Rounds")
                 Picker("Rounds", selection: $workout.rounds){
@@ -198,41 +259,52 @@ struct EditWorkoutScreen: View {
                 }
                 .pickerStyle(.segmented)
             }
-
+            
             VStack {
                 Text("Exercises")
-                               List {
-                                   ForEach(workout.exercises, id: \.self) { element in
-                                       Text(element)
-                                        }
-                                   }
-                               
-
-                               HStack {
-                                   TextField("Add Exercise", text: $exerciseToAdd)
-                                       .textFieldStyle(RoundedBorderTextFieldStyle())
-                                   Button("Add") {
-                                       if !exerciseToAdd.isEmpty {
-                                           workout.exercises.append(exerciseToAdd)
-                                           exerciseToAdd = ""
-                                       }
-                                   }
-                               }
-            }
-            
-            Button("Save") {
+                List {
+                    ForEach(workout.exercises, id: \.self) { element in
+                        Text(element)
+                    }
+                }
+                .listStyle(.plain)
                 
-                saveWorkout(workout: workout) { result in
-                                    switch result {
-                                    case .success():
-                                        dismiss()
-                                    case .failure(let error):
-                                        print("Error saving workout:", error.localizedDescription)
-                                    }
-                                }
+                HStack {
+                    TextField("Add Exercise", text: $exerciseToAdd)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    Button("Add") {
+                        if !exerciseToAdd.isEmpty {
+                            workout.exercises.append(exerciseToAdd)
+                            exerciseToAdd = ""
+                        }
+                    }
+                }
+                .padding()
+            }
+            .padding()
+            
+            HStack{
+                Button("Save") {
+                    saveWorkout(workout: workout) { result in
+                        switch result {
+                        case .success():
+                            savedNewWorkout = true
+                            dismiss()
+                        case .failure(let error):
+                            print("Error saving workout:", error.localizedDescription)
+                        }
+                    }
+                }
+            
+            }
+            .padding()
+        }
+        .onDisappear(){
+            if (isNewWorkout == true && savedNewWorkout == false) {
+                workouts.removeLast()
+                isNewWorkout = false
             }
         }
-        .padding()
     }
 }
 
@@ -254,8 +326,6 @@ struct WorkoutScreen: View {
     
     @State private var startWorkoutQueueItem: DispatchWorkItem?
 
-
-    
     
     func startWorkout() {
         UIApplication.shared.isIdleTimerDisabled = true // Prevent sleep mode
@@ -317,7 +387,7 @@ struct WorkoutScreen: View {
                 currentExercise += 1
                 if currentExercise < workout.exercises.count {
                     let nextExercise = workout.exercises[currentExercise]
-                    speak(text: "Prepare for \(nextExercise) in 3 seconds")
+                    speak(text: "Prepare for \(nextExercise)")
                 } else {
                     currentExercise = 0
                     currentRound += 1
@@ -372,6 +442,7 @@ struct WorkoutScreen: View {
     func pauseWorkout() {
         startWorkoutQueueItem?.cancel()
         isRunning = false
+        isWorkoutActive = false
         timeLeft = timeRemaining
         timer?.invalidate()
     }
@@ -382,6 +453,7 @@ struct WorkoutScreen: View {
         startWorkoutQueueItem?.cancel()
         timer?.invalidate()
         isRunning = false
+        isWorkoutActive = false
         currentExercise = 0
         currentRound = 0
         timeRemaining = localActiveTime
@@ -440,8 +512,6 @@ struct WorkoutScreen: View {
             
             Spacer()
             
-            
-            
             Text(isRunning ? "Current Exercise: \(workout.exercises[currentExercise])" :"Next Exercise: \(workout.exercises[currentExercise])").font(.headline)
             Text("Time Remaining").font(.title)
             Text(isRunning ? "\(timeRemaining)" : "\(localActiveTime)").font(.system(size: 80))
@@ -450,14 +520,17 @@ struct WorkoutScreen: View {
                 Button(isRunning ? "Pause" : "Start") {
                     isRunning ? pauseWorkout() : startWorkout()
                 }
+                .buttonStyle(.borderedProminent)
                 .padding()
                 
                 Button("Reset") {
                     resetWorkout()
                 }
+                .buttonStyle(.bordered)
                 .padding()
             }
         }
+        .background(isWorkoutActive ? Color(.systemGreen) : Color(.systemBackground))
         .onAppear {
             configureAudioSession() // Call the function when the view appears
             setLocalTimes()
@@ -465,12 +538,13 @@ struct WorkoutScreen: View {
         .onDisappear {
                 resetWorkout()
                 }
+        
     }
 }
 
 struct ContentView: View {
     var body: some View {
-        StartScreen()
+        WelcomeScreen()
     }
 }
 
