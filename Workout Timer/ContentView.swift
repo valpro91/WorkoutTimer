@@ -6,22 +6,44 @@ import UIKit // Required for UIApplication.shared
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-
-
-class Workout: Identifiable, Hashable, Equatable, Encodable, Decodable {
-    var id: UUID // This field will be used for hashing
+class Set: Identifiable, Hashable, Equatable, Encodable, Decodable {
+    var id: UUID
     var name: String
     var exercises: [String] = []
     var activeTime: Int
     var pauseTime: Int
-    var rounds: Int
     
-    init(id: UUID = UUID(), name: String, exercises: [String] = [], activeTime: Int, pauseTime: Int, rounds: Int) {
+    init(id: UUID, name: String, exercises: [String], activeTime: Int, pauseTime: Int) {
         self.id = id
         self.name = name
         self.exercises = exercises
         self.activeTime = activeTime
         self.pauseTime = pauseTime
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func ==(lhs: Set, rhs: Set) -> Bool {
+        return lhs.id == rhs.id // Equality check based on `UUID`
+    }
+}
+
+class Workout: Identifiable, Hashable, Equatable, Encodable, Decodable {
+    var id: UUID // This field will be used for hashing
+    var name: String
+    var sets: [Set] = []
+//    var activeTime: Int
+//    var pauseTime: Int
+    var rounds: Int
+    
+    init(id: UUID = UUID(), name: String, sets: [Set] = [], activeTime: Int, pauseTime: Int, rounds: Int) {
+        self.id = id
+        self.name = name
+        self.sets = sets
+//        self.activeTime = activeTime
+//        self.pauseTime = pauseTime
         self.rounds = rounds
     }
     
@@ -37,10 +59,10 @@ class Workout: Identifiable, Hashable, Equatable, Encodable, Decodable {
 
 
 // Save a single workout to Firestore
-func saveWorkout(workout: Workout, completion: @escaping (Result<Void, Error>) -> Void) {
+func saveSet(set: Set, completion: @escaping (Result<Void, Error>) -> Void) {
     let db = Firestore.firestore()
     do {
-        try db.collection("workouts").document(workout.id.uuidString).setData(from: workout) { error in
+        try db.collection("sets").document(set.id.uuidString).setData(from: set) { error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -53,24 +75,24 @@ func saveWorkout(workout: Workout, completion: @escaping (Result<Void, Error>) -
 }
 
 // Load all workouts from Firestore
-func loadWorkouts(completion: @escaping (Result<[Workout], Error>) -> Void) {
+func loadSets(completion: @escaping (Result<[Set], Error>) -> Void) {
     let db = Firestore.firestore()
-    db.collection("workouts").getDocuments { querySnapshot, error in
+    db.collection("sets").getDocuments { querySnapshot, error in
         if let error = error {
             completion(.failure(error))
         } else {
-            let workouts: [Workout] = querySnapshot?.documents.compactMap { doc in
-                try? doc.data(as: Workout.self)
+            let sets: [Set] = querySnapshot?.documents.compactMap { doc in
+                try? doc.data(as: Set.self)
             } ?? []
-            completion(.success(workouts))
+            completion(.success(sets))
         }
     }
 }
 
 // Delete a workout from Firestore
-func deleteWorkout(workout: Workout, completion: @escaping (Result<Void, Error>) -> Void) {
+func deleteSet(set: Set, completion: @escaping (Result<Void, Error>) -> Void) {
     let db = Firestore.firestore()
-    db.collection("workouts").document(workout.id.uuidString).delete { error in
+    db.collection("sets").document(set.id.uuidString).delete { error in
         if let error = error {
             completion(.failure(error))
         } else {
@@ -81,13 +103,13 @@ func deleteWorkout(workout: Workout, completion: @escaping (Result<Void, Error>)
 
 
 // Define a custom SwiftUI cell to represent each workout in the list
-struct WorkoutCell: View {
-    let workout: Workout
+struct SetCell: View {
+    let set: Set
     let onEdit: () -> Void // Closure for the edit action
 
     var body: some View {
         HStack {
-            Text(workout.name) // Workout name
+            Text(set.name) // Workout name
                 .font(.headline)
             Spacer()
 
@@ -99,7 +121,7 @@ struct WorkoutCell: View {
                     .buttonStyle(.borderless)
                     .frame(width: 20)
 
-                NavigationLink(destination: WorkoutScreen(workout: .constant(workout))) { // Navigation to the
+                NavigationLink(destination: DoSetScreen(set: .constant(set))) { // Navigation to the
                     }
                     .frame(width: 20)
                 }
@@ -109,22 +131,21 @@ struct WorkoutCell: View {
 
 struct WelcomeScreen: View {
     
-    
     var body: some View {
         NavigationStack{
             VStack{
                 Text("Hello World")
                 NavigationLink(destination: SetListScreen()) {  // <-- Move NavigationLink outside
                     Text("Do Something")
-                                
-                              }
+
+                }
             }
         }
     }
 }
 
 struct CreateWorkoutPlaylistScreen: View {
-    @State private var sets: [Workout] = []
+    @State private var sets: [Set] = []
     @State private var errorMessage: String?
 
     var body: some View {
@@ -132,37 +153,36 @@ struct CreateWorkoutPlaylistScreen: View {
             Text("Here you can create your Full Workout")
         }
         .onAppear(){
-            loadWorkouts { result in
+            loadSets { result in
                 switch result {
-                case .success(let fetchedWorkouts):
-                    sets = fetchedWorkouts
+                case .success(let fetchedSets):
+                    sets = fetchedSets
                 case .failure(let error):
                     errorMessage = error.localizedDescription
                 }
             }
         }
     }
-       
 }
 
 
 struct SetListScreen: View {
-    @State private var workouts: [Workout] = []
-    @State private var selectedWorkout: Workout = Workout(name: "Default", activeTime: 1, pauseTime: 1, rounds: 1)
+    @State private var sets: [Set] = []
+    @State private var selectedSet: Set = Set(id: UUID(), name: "Default", exercises: ["deadlift"], activeTime: 1, pauseTime: 1)
     
     @State private var showingEditScreen = false
-    @State private var isNewWorkout = false
+    @State private var isNewSet = false
     @State private var errorMessage: String?
 
         var body: some View {
             NavigationView {
                 VStack{
-                    List(workouts) { workout in
-                        WorkoutCell(
-                            workout: workout,
+                    List(sets) { set in
+                       SetCell(
+                            set: set,
                             onEdit: {
                                 
-                                selectedWorkout = workout // Store ID
+                                selectedSet = set // Store ID
                                 showingEditScreen = true
                             
                             }
@@ -171,27 +191,27 @@ struct SetListScreen: View {
                     .listStyle(.plain)
                     .sheet(isPresented: $showingEditScreen) {
                         
-                            EditWorkoutScreen(workout: $selectedWorkout, workouts: $workouts, isNewWorkout: $isNewWorkout)
+                            EditSetScreen(set: $selectedSet, sets: $sets, isNewSet: $isNewSet)
                      
                     }
                     
                     Button("Add New Workout", systemImage: "plus.circle", action: {
-                        let newWorkout = Workout(name: "New Workout", activeTime: 0, pauseTime: 0, rounds: 0)
-                        workouts.append(newWorkout)
-                        selectedWorkout = newWorkout
+                        let newSet = Set(id: UUID(), name: "New Workout", exercises: [], activeTime: 0, pauseTime: 0)
+                        sets.append(newSet)
+                        selectedSet = newSet
                         showingEditScreen = true
-                        isNewWorkout = true
+                        isNewSet = true
                     })
                     .font(.largeTitle)
                     .labelStyle(.iconOnly)
                 }
-                .navigationBarTitle("Workouts")
+                .navigationBarTitle("Sets")
                 .onAppear(){
                     print("Loading")
-                    loadWorkouts { result in
+                    loadSets { result in
                         switch result {
-                        case .success(let fetchedWorkouts):
-                            workouts = fetchedWorkouts
+                        case .success(let fetchedSets):
+                            sets = fetchedSets
                         case .failure(let error):
                             errorMessage = error.localizedDescription
                         }
@@ -202,11 +222,11 @@ struct SetListScreen: View {
 }
 
 
-struct EditWorkoutScreen: View {
-    @Binding var workout: Workout
-    @Binding var workouts: [Workout]
-    @Binding var isNewWorkout: Bool
-    @State private var savedNewWorkout: Bool = false
+struct EditSetScreen: View {
+    @Binding var set: Set
+    @Binding var sets: [Set]
+    @Binding var isNewSet: Bool
+    @State private var savedNewSet: Bool = false
     
     @Environment(\.dismiss) var dismiss
     @State private var exerciseToAdd = ""
@@ -217,7 +237,7 @@ struct EditWorkoutScreen: View {
     var body: some View {
         VStack {
             HStack {
-                TextField(workout.name, text: $workout.name)
+                TextField(set.name, text: $set.name)
                     .font(.largeTitle)
                     .padding()
             }
@@ -227,7 +247,7 @@ struct EditWorkoutScreen: View {
             HStack {
                 VStack{
                     Text("Active Time")
-                    Picker("Active Time", selection: $workout.activeTime) {
+                    Picker("Active Time", selection: $set.activeTime) {
                         ForEach([15,30,45,60,75,90,120], id: \.self) { time in
                             Text("\(time)").tag(time)
                         }
@@ -239,7 +259,7 @@ struct EditWorkoutScreen: View {
                 
                 VStack{
                     Text("Pause Time")
-                    Picker("Pause Time", selection: $workout.pauseTime){
+                    Picker("Pause Time", selection: $set.pauseTime){
                         ForEach([0,5,10,15,30], id: \.self) { time in
                             Text("\(time)").tag(time)
                         }
@@ -250,20 +270,10 @@ struct EditWorkoutScreen: View {
                 
             }
             
-            HStack {
-                Text("Rounds")
-                Picker("Rounds", selection: $workout.rounds){
-                    ForEach([1,2,3,4,5], id: \.self) { rounds in
-                        Text("\(rounds)").tag(rounds)
-                    }
-                }
-                .pickerStyle(.segmented)
-            }
-            
             VStack {
                 Text("Exercises")
                 List {
-                    ForEach(workout.exercises, id: \.self) { element in
+                    ForEach(set.exercises, id: \.self) { element in
                         Text(element)
                     }
                 }
@@ -274,7 +284,7 @@ struct EditWorkoutScreen: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button("Add") {
                         if !exerciseToAdd.isEmpty {
-                            workout.exercises.append(exerciseToAdd)
+                            set.exercises.append(exerciseToAdd)
                             exerciseToAdd = ""
                         }
                     }
@@ -285,10 +295,10 @@ struct EditWorkoutScreen: View {
             
             HStack{
                 Button("Save") {
-                    saveWorkout(workout: workout) { result in
+                    saveSet(set: set) { result in
                         switch result {
                         case .success():
-                            savedNewWorkout = true
+                            savedNewSet = true
                             dismiss()
                         case .failure(let error):
                             print("Error saving workout:", error.localizedDescription)
@@ -300,21 +310,21 @@ struct EditWorkoutScreen: View {
             .padding()
         }
         .onDisappear(){
-            if (isNewWorkout == true && savedNewWorkout == false) {
-                workouts.removeLast()
-                isNewWorkout = false
+            if (isNewSet == true && savedNewSet == false) {
+                sets.removeLast()
+                isNewSet = false
             }
         }
     }
 }
 
-struct WorkoutScreen: View {
-    @Binding var workout: Workout
+struct DoSetScreen: View {
+    @Binding var set: Set
     @State private var audioPlayer: AVAudioPlayer?
     @State private var speechSynthesizer = AVSpeechSynthesizer()
     @State private var timer: Timer? = nil
     @State private var isRunning = false
-    @State private var isWorkoutActive = false
+    @State private var isSetActive = false
     @State private var currentExercise = 0
     @State private var currentRound = 0
     @State private var timeRemaining = 0
@@ -327,10 +337,10 @@ struct WorkoutScreen: View {
     @State private var startWorkoutQueueItem: DispatchWorkItem?
 
     
-    func startWorkout() {
+    func startSet() {
         UIApplication.shared.isIdleTimerDisabled = true // Prevent sleep mode
         isRunning = true
-        isWorkoutActive = true
+        isSetActive = true
         
         // Announce the first exercise
         
@@ -343,7 +353,7 @@ struct WorkoutScreen: View {
                }
         
         if timeLeft == 0 {
-            let exerciseName = workout.exercises[currentExercise]
+            let exerciseName = set.exercises[currentExercise]
             speak(text: "Starting \(exerciseName)")
             timeRemaining = localActiveTime
             DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: startWorkoutQueueItem!)
@@ -376,29 +386,29 @@ struct WorkoutScreen: View {
         if timeRemaining > 0 {
             timeRemaining -= 1
     
-            speakCountdown(for: timeRemaining, isActivePhase: isWorkoutActive)
+            speakCountdown(for: timeRemaining, isActivePhase: isSetActive)
             
             } else {
-            if isWorkoutActive {
-                isWorkoutActive = false
+            if isSetActive {
+                isSetActive = false
                 timeRemaining = localPauseTime
                 playTone("end")
                 
                 currentExercise += 1
-                if currentExercise < workout.exercises.count {
-                    let nextExercise = workout.exercises[currentExercise]
+                if currentExercise < set.exercises.count {
+                    let nextExercise = set.exercises[currentExercise]
                     speak(text: "Prepare for \(nextExercise)")
                 } else {
                     currentExercise = 0
                     currentRound += 1
                     if currentRound >= localRounds {
                         playTone("complete")
-                        resetWorkout() // Reset once complete
+                        resetSet() // Reset once complete
                         return
                     }
                 }
             } else {
-                isWorkoutActive = true
+                isSetActive = true
                 timeRemaining = localActiveTime
                 playTone("start")
             }
@@ -439,21 +449,21 @@ struct WorkoutScreen: View {
         }
     }
     
-    func pauseWorkout() {
+    func pauseSet() {
         startWorkoutQueueItem?.cancel()
         isRunning = false
-        isWorkoutActive = false
+        isSetActive = false
         timeLeft = timeRemaining
         timer?.invalidate()
     }
 
-    func resetWorkout() {
+    func resetSet() {
         UIApplication.shared.isIdleTimerDisabled = false // Prevent sleep mode
 
         startWorkoutQueueItem?.cancel()
         timer?.invalidate()
         isRunning = false
-        isWorkoutActive = false
+        isSetActive = false
         currentExercise = 0
         currentRound = 0
         timeRemaining = localActiveTime
@@ -464,14 +474,14 @@ struct WorkoutScreen: View {
     }
     
     func setLocalTimes() {
-        localActiveTime = workout.activeTime
-        localPauseTime = workout.pauseTime
-        localRounds = workout.rounds
+        localActiveTime = set.activeTime
+        localPauseTime = set.pauseTime
+        localRounds = 1
     }
     
     var body: some View {
         VStack {
-            Text(workout.name).font(.largeTitle)
+            Text(set.name).font(.largeTitle)
             Spacer()
             HStack {
                 VStack{
@@ -512,31 +522,31 @@ struct WorkoutScreen: View {
             
             Spacer()
             
-            Text(isRunning ? "Current Exercise: \(workout.exercises[currentExercise])" :"Next Exercise: \(workout.exercises[currentExercise])").font(.headline)
+            Text(isRunning ? "Current Exercise: \(set.exercises[currentExercise])" :"Next Exercise: \(set.exercises[currentExercise])").font(.headline)
             Text("Time Remaining").font(.title)
             Text(isRunning ? "\(timeRemaining)" : "\(localActiveTime)").font(.system(size: 80))
             
             HStack {
                 Button(isRunning ? "Pause" : "Start") {
-                    isRunning ? pauseWorkout() : startWorkout()
+                    isRunning ? pauseSet() : startSet()
                 }
                 .buttonStyle(.borderedProminent)
                 .padding()
                 
                 Button("Reset") {
-                    resetWorkout()
+                    resetSet()
                 }
                 .buttonStyle(.bordered)
                 .padding()
             }
         }
-        .background(isWorkoutActive ? Color(.systemGreen) : Color(.systemBackground))
+        .background(isSetActive ? Color(.systemGreen) : Color(.systemBackground))
         .onAppear {
             configureAudioSession() // Call the function when the view appears
             setLocalTimes()
                 }
         .onDisappear {
-                resetWorkout()
+                resetSet()
                 }
         
     }
