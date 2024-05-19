@@ -13,7 +13,7 @@ class Set: Identifiable, Hashable, Equatable, Encodable, Decodable {
     var activeTime: Int
     var pauseTime: Int
     
-    init(id: UUID, name: String, exercises: [String], activeTime: Int, pauseTime: Int) {
+    init(id: UUID = UUID(), name: String, exercises: [String], activeTime: Int, pauseTime: Int) {
         self.id = id
         self.name = name
         self.exercises = exercises
@@ -33,17 +33,13 @@ class Set: Identifiable, Hashable, Equatable, Encodable, Decodable {
 class Workout: Identifiable, Hashable, Equatable, Encodable, Decodable {
     var id: UUID // This field will be used for hashing
     var name: String
-    var sets: [Set] = []
-//    var activeTime: Int
-//    var pauseTime: Int
+    var sets: [UUID: Int]
     var rounds: Int
     
-    init(id: UUID = UUID(), name: String, sets: [Set] = [], activeTime: Int, pauseTime: Int, rounds: Int) {
+    init(id: UUID = UUID(), name: String, sets: [UUID: Int], rounds: Int) {
         self.id = id
         self.name = name
         self.sets = sets
-//        self.activeTime = activeTime
-//        self.pauseTime = pauseTime
         self.rounds = rounds
     }
     
@@ -57,6 +53,44 @@ class Workout: Identifiable, Hashable, Equatable, Encodable, Decodable {
     }
 }
 
+class LocalWorkout: Identifiable, Hashable, Equatable, Encodable, Decodable {
+    var id: UUID // This field will be used for hashing
+    var name: String
+    var sets: [Set: Int] = [:]
+    var rounds: Int
+    
+    init(id: UUID = UUID(), name: String, sets: [Set: Int] = [:], rounds: Int) {
+        self.id = id
+        self.name = name
+        self.sets = sets
+        self.rounds = rounds
+    }
+    
+    // Implement the `Hashable` requirements
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id) // Use the unique `UUID` to ensure a unique hash
+    }
+    
+    static func ==(lhs: LocalWorkout, rhs: LocalWorkout) -> Bool {
+        return lhs.id == rhs.id // Equality check based on `UUID`
+    }
+}
+
+// Save a single workout to Firestore
+func saveWorkout(workout: Workout, completion: @escaping (Result<Void, Error>) -> Void) {
+    let db = Firestore.firestore()
+    do {
+        try db.collection("workouts").document(workout.id.uuidString).setData(from: workout) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
+        }
+    } catch {
+        completion(.failure(error))
+    }
+}
 
 // Save a single workout to Firestore
 func saveSet(set: Set, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -73,8 +107,22 @@ func saveSet(set: Set, completion: @escaping (Result<Void, Error>) -> Void) {
         completion(.failure(error))
     }
 }
-
 // Load all workouts from Firestore
+func loadWorkouts(completion: @escaping (Result<[Workout], Error>) -> Void) {
+    let db = Firestore.firestore()
+    db.collection("workouts").getDocuments { querySnapshot, error in
+        if let error = error {
+            completion(.failure(error))
+        } else {
+            let workouts: [Workout] = querySnapshot?.documents.compactMap { doc in
+                try? doc.data(as: Workout.self)
+            } ?? []
+            completion(.success(workouts))
+        }
+    }
+}
+
+// Load all sets from Firestore
 func loadSets(completion: @escaping (Result<[Set], Error>) -> Void) {
     let db = Firestore.firestore()
     db.collection("sets").getDocuments { querySnapshot, error in
@@ -90,6 +138,18 @@ func loadSets(completion: @escaping (Result<[Set], Error>) -> Void) {
 }
 
 // Delete a workout from Firestore
+func deleteWorkout(workout: Workout, completion: @escaping (Result<Void, Error>) -> Void) {
+    let db = Firestore.firestore()
+    db.collection("workouts").document(workout.id.uuidString).delete { error in
+        if let error = error {
+            completion(.failure(error))
+        } else {
+            completion(.success(()))
+        }
+    }
+}
+
+// Delete a set from Firestore
 func deleteSet(set: Set, completion: @escaping (Result<Void, Error>) -> Void) {
     let db = Firestore.firestore()
     db.collection("sets").document(set.id.uuidString).delete { error in
@@ -121,7 +181,7 @@ struct SetCell: View {
                     .buttonStyle(.borderless)
                     .frame(width: 20)
 
-                NavigationLink(destination: DoSetScreen(set: .constant(set))) { // Navigation to the
+                NavigationLink(destination: DoWorkoutScreen(workout: LocalWorkout(name: set.name, sets: [set: 1], rounds: 1), workoutSets: [set], currentSet: set)) { // Navigation to the
                     }
                     .frame(width: 20)
                 }
@@ -129,36 +189,279 @@ struct SetCell: View {
     }
 }
 
+
+struct WorkoutCell: View {
+    @State var workout: Workout
+    
+    var body: some View {
+        HStack{
+            Text(workout.name)
+                .font(.title)
+            Spacer()
+            NavigationLink(destination: ShowWorkoutScreen(workout: $workout)){
+                Text("Show")
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        
+        .onDisappear(){
+            print("Disappear")
+            print(workout)
+        }
+    }
+}
+
 struct WelcomeScreen: View {
+    
+    @State private var workouts: [Workout] = []
+    @State private var setLibrary: [Set] = []
+        
+    @State private var errorMessage: String?
     
     var body: some View {
         NavigationStack{
             VStack{
-                Text("Hello World")
-                NavigationLink(destination: SetListScreen()) {  // <-- Move NavigationLink outside
-                    Text("Do Something")
-
+                Text("Your Workouts")
+                    .font(.largeTitle)
+                
+                List(workouts){ workout in
+                        WorkoutCell(workout: workout)
+                }
+                .listStyle(.plain)
+                HStack{
+                    NavigationLink(destination: SetListScreen()) {
+                        Text("Set Library")
+                    }
+                    .padding()
+                    
+                    Spacer()
+                    
+                    NavigationLink(destination: CreateWorkoutScreen()) {  // <-- Move NavigationLink outside
+                        Text("Add new Workout")
+                    }
+                    .padding()
+                }
+            }
+        }
+        .onAppear() {
+            loadSets { result in
+                switch result {
+                case .success(let fetchedSets):
+                    setLibrary = fetchedSets
+                    print(setLibrary)
+                case .failure(let error):
+                    errorMessage = error.localizedDescription
+                }
+            }
+            
+            loadWorkouts { result in
+                switch result  {
+                case .success(let fetchedWorkouts):
+                    workouts = fetchedWorkouts
+                    print(workouts)
+                case .failure(let error):
+                    errorMessage = error.localizedDescription
                 }
             }
         }
     }
 }
 
-struct CreateWorkoutPlaylistScreen: View {
+struct CreateWorkoutScreen: View {
     @State private var sets: [Set] = []
     @State private var errorMessage: String?
+    
+    @State private var workoutSetList: [Set] = []
+    @State private var newWorkoutName: String = "New Workout"
+    @State private var workoutRounds: Int = 1
+    @State private var workoutSetDict: [UUID: Int] = [:]
+    
+    @State private var showNewSetSheet: Bool = false
+    @State private var isNewSet: Bool = false
+    @State private var newSet: Set = Set(name: "New Set", exercises: [], activeTime: 60, pauseTime: 0)
+    
+    func saveNewWorkout(name: String, workoutSetDict: [UUID: Int], rounds: Int) {
+        let workoutToSave = Workout(name: name, sets: workoutSetDict, rounds: rounds)
+        saveWorkout(workout: workoutToSave){ result in
+            switch result {
+            case .success():
+                break
+            case .failure(let error):
+                print("Error saving workout:", error.localizedDescription)
+            }
+        }
+        
+    }
 
     var body: some View {
-        VStack{
-            Text("Here you can create your Full Workout")
+    
+        NavigationView{
+            VStack{
+                HStack{
+                    TextField(newWorkoutName, text: $newWorkoutName)
+                        .font(.largeTitle)
+                        .padding()
+                    
+                    Button("Save"){
+                        saveNewWorkout(name: newWorkoutName, workoutSetDict: workoutSetDict, rounds: workoutRounds)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding()
+                }
+                    Text("Sets in your new Workout")
+                    
+                
+                List(workoutSetList) { set in
+                    HStack{
+                        Text(set.name)
+                            .font(.title)
+                            .frame(width: UIScreen.main.bounds.width/4)
+                        Spacer()
+                        
+                        Picker("Rounds", selection: Binding(
+                            get: { workoutSetDict[set.id] ?? 1 },
+                            set: { workoutSetDict[set.id] = $0 }
+                        )){
+                            ForEach(1...10, id: \.self) { round in
+                                Text("\(round)").tag(round)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(width: UIScreen.main.bounds.width/3)
+
+    
+
+                        Spacer()
+                        Button("Remove"){
+                            let index = workoutSetList.firstIndex(of:set)
+                            workoutSetList.remove(at: index ?? 0)
+                            workoutSetDict[set.id] = nil
+                        }
+                        .buttonStyle(.borderless)
+                    }
+                }
+                .listStyle(.grouped)
+                Text("Workout Rounds:")
+                    .font(.callout)
+                Picker("Rounds", selection: $workoutRounds){
+                    ForEach([1,2,3,4,5], id: \.self) { round in
+                        Text("\(round)").tag(round)
+                    }
+                }
+                    .pickerStyle(.segmented)
+                Spacer()
+                HStack{
+                    Text("Set Library")
+                    Button("New Set", systemImage: "plus.circle", action: {
+                        sets.append(newSet)
+                        isNewSet = true
+                        showNewSetSheet = true
+                        
+                        
+                    })
+                    .labelStyle(.iconOnly)
+              
+                }
+                .sheet(isPresented: $showNewSetSheet) {
+                    
+                    EditSetScreen(set: $newSet, sets: $sets, isNewSet: $isNewSet)
+                 
+                }
+               
+                
+                List(sets) {set in
+                    HStack{
+                        Text(set.name)
+                            .font(.title)
+                        Spacer()
+                        Button("Add"){
+                            
+                            if workoutSetDict[set.id] == nil {
+                                workoutSetList.append(set)
+                                workoutSetDict[set.id] = 1
+                            } else {
+                                
+                            }
+                        }
+                    }
+                }
+                .listStyle(.grouped)
+            }
+            .onAppear(){
+                loadSets { result in
+                    switch result {
+                    case .success(let fetchedSets):
+                        sets = fetchedSets
+                    case .failure(let error):
+                        errorMessage = error.localizedDescription
+                    }
+                }
+            }
         }
-        .onAppear(){
-            loadSets { result in
-                switch result {
-                case .success(let fetchedSets):
-                    sets = fetchedSets
-                case .failure(let error):
-                    errorMessage = error.localizedDescription
+    }
+}
+
+struct ShowWorkoutScreen: View {
+    @Binding var workout: Workout
+    @State private var setLibrary: [Set] = []
+    @State private var workoutSetArray: [Set] = []
+    @State private var workoutSetRoundsDict: [Set: Int] = [:]
+    
+    @State private var errorMessage: String?
+    
+    // Design Workout Screen
+    // Design DoWorkout Screen
+    // Handle Storage, Saving and Loading globally
+    // split up code in multiple files
+    
+    
+    func matchSetIDsWithSets(workoutDict: [UUID: Int]) -> [Set]{
+        let setIDArray = Array(workoutDict.keys)
+        let workoutSets = setLibrary.filter { set in
+            if workout.sets[set.id] != nil {
+                return true
+            } else {
+                return false
+            }
+        }
+        return workoutSets
+    }
+    
+    func createSetRoundsDict(workoutSetArray: [Set], workoutDict: [UUID: Int]) -> [Set: Int] {
+        var workoutSetDict: [Set: Int] = [:]
+        for set in workoutSetArray {
+            workoutSetDict[set] = workoutDict[set.id]
+        }
+        return workoutSetDict
+    }
+    
+    var body: some View{
+        NavigationView{
+            VStack{
+                Text(workout.name)
+//                List(workoutSetArray){ set in
+//                    Text("Hello")
+//                    
+//                }
+                NavigationLink(destination: DoWorkoutScreen(workout: LocalWorkout(name: workout.name, sets: workoutSetRoundsDict ,rounds: workout.rounds), workoutSets: workoutSetArray, currentSet: workoutSetArray.first ?? Set(name: "Default", exercises: [], activeTime: 60, pauseTime: 0))){
+                    Text("Start Workout")
+                }
+            }
+            .onAppear(){
+                print("hello")
+                loadSets { result in
+                    switch result {
+                    case .success(let fetchedSets):
+                        setLibrary = fetchedSets
+                        workoutSetArray = matchSetIDsWithSets(workoutDict: workout.sets)
+                        workoutSetRoundsDict = createSetRoundsDict(workoutSetArray: workoutSetArray, workoutDict: workout.sets)
+                        print("hello")
+                        print(workoutSetArray)
+                        print(workoutSetRoundsDict)
+                    case .failure(let error):
+                        
+                        errorMessage = error.localizedDescription
+                    }
                 }
             }
         }
@@ -168,7 +471,7 @@ struct CreateWorkoutPlaylistScreen: View {
 
 struct SetListScreen: View {
     @State private var sets: [Set] = []
-    @State private var selectedSet: Set = Set(id: UUID(), name: "Default", exercises: ["deadlift"], activeTime: 1, pauseTime: 1)
+    @State private var selectedSet: Set = Set(name: "Default", exercises: ["deadlift"], activeTime: 1, pauseTime: 1)
     
     @State private var showingEditScreen = false
     @State private var isNewSet = false
@@ -195,8 +498,8 @@ struct SetListScreen: View {
                      
                     }
                     
-                    Button("Add New Workout", systemImage: "plus.circle", action: {
-                        let newSet = Set(id: UUID(), name: "New Workout", exercises: [], activeTime: 0, pauseTime: 0)
+                    Button("Add New Set", systemImage: "plus.circle", action: {
+                        let newSet = Set(name: "New Workout", exercises: [], activeTime: 0, pauseTime: 0)
                         sets.append(newSet)
                         selectedSet = newSet
                         showingEditScreen = true
@@ -318,13 +621,18 @@ struct EditSetScreen: View {
     }
 }
 
-struct DoSetScreen: View {
-    @Binding var set: Set
+struct DoWorkoutScreen: View {
+    @State var workout: LocalWorkout
+    @State var workoutSets: [Set]
+    @State var currentSet: Set
+    
     @State private var audioPlayer: AVAudioPlayer?
     @State private var speechSynthesizer = AVSpeechSynthesizer()
     @State private var timer: Timer? = nil
     @State private var isRunning = false
     @State private var isSetActive = false
+    
+    
     @State private var currentExercise = 0
     @State private var currentRound = 0
     @State private var timeRemaining = 0
@@ -337,7 +645,7 @@ struct DoSetScreen: View {
     @State private var startWorkoutQueueItem: DispatchWorkItem?
 
     
-    func startSet() {
+    func startWorkout() {
         UIApplication.shared.isIdleTimerDisabled = true // Prevent sleep mode
         isRunning = true
         isSetActive = true
@@ -353,7 +661,7 @@ struct DoSetScreen: View {
                }
         
         if timeLeft == 0 {
-            let exerciseName = set.exercises[currentExercise]
+            let exerciseName = currentSet.exercises[currentExercise]
             speak(text: "Starting \(exerciseName)")
             timeRemaining = localActiveTime
             DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: startWorkoutQueueItem!)
@@ -395,15 +703,15 @@ struct DoSetScreen: View {
                 playTone("end")
                 
                 currentExercise += 1
-                if currentExercise < set.exercises.count {
-                    let nextExercise = set.exercises[currentExercise]
+                if currentExercise < currentSet.exercises.count {
+                    let nextExercise = currentSet.exercises[currentExercise]
                     speak(text: "Prepare for \(nextExercise)")
                 } else {
                     currentExercise = 0
                     currentRound += 1
                     if currentRound >= localRounds {
                         playTone("complete")
-                        resetSet() // Reset once complete
+                        resetWorkout() // Reset once complete
                         return
                     }
                 }
@@ -449,7 +757,7 @@ struct DoSetScreen: View {
         }
     }
     
-    func pauseSet() {
+    func pauseWorkout() {
         startWorkoutQueueItem?.cancel()
         isRunning = false
         isSetActive = false
@@ -457,7 +765,7 @@ struct DoSetScreen: View {
         timer?.invalidate()
     }
 
-    func resetSet() {
+    func resetWorkout() {
         UIApplication.shared.isIdleTimerDisabled = false // Prevent sleep mode
 
         startWorkoutQueueItem?.cancel()
@@ -465,23 +773,31 @@ struct DoSetScreen: View {
         isRunning = false
         isSetActive = false
         currentExercise = 0
+        currentSet = workoutSets[0]
         currentRound = 0
         timeRemaining = localActiveTime
     }
     
     func defaultTimes() {
-        setLocalTimes()
+        updateLocalTimes()
     }
     
-    func setLocalTimes() {
-        localActiveTime = set.activeTime
-        localPauseTime = set.pauseTime
+    func updateLocalTimes() {
+        localActiveTime = currentSet.activeTime
+        localPauseTime = currentSet.pauseTime
         localRounds = 1
     }
     
+    
     var body: some View {
         VStack {
-            Text(set.name).font(.largeTitle)
+            Text(workout.name).font(.largeTitle)
+            
+            List(workoutSets) { set in
+                Text(set.name)
+            }
+            
+            Text("Current set: \(currentSet.name)").font(.title)
             Spacer()
             HStack {
                 VStack{
@@ -493,7 +809,6 @@ struct DoSetScreen: View {
                     }
                     .pickerStyle(.wheel)
                     .frame(height: 125)
-                    
                 }
                 
                 VStack{
@@ -522,19 +837,19 @@ struct DoSetScreen: View {
             
             Spacer()
             
-            Text(isRunning ? "Current Exercise: \(set.exercises[currentExercise])" :"Next Exercise: \(set.exercises[currentExercise])").font(.headline)
+            Text(isRunning ? "Current Exercise: \(currentSet.exercises[currentExercise])" :"Next Exercise: \(currentSet.exercises[currentExercise])").font(.headline)
             Text("Time Remaining").font(.title)
             Text(isRunning ? "\(timeRemaining)" : "\(localActiveTime)").font(.system(size: 80))
             
             HStack {
                 Button(isRunning ? "Pause" : "Start") {
-                    isRunning ? pauseSet() : startSet()
+                    isRunning ? pauseWorkout() : startWorkout()
                 }
                 .buttonStyle(.borderedProminent)
                 .padding()
                 
                 Button("Reset") {
-                    resetSet()
+                    resetWorkout()
                 }
                 .buttonStyle(.bordered)
                 .padding()
@@ -543,10 +858,10 @@ struct DoSetScreen: View {
         .background(isSetActive ? Color(.systemGreen) : Color(.systemBackground))
         .onAppear {
             configureAudioSession() // Call the function when the view appears
-            setLocalTimes()
+            updateLocalTimes()
                 }
         .onDisappear {
-                resetSet()
+                resetWorkout()
                 }
         
     }
