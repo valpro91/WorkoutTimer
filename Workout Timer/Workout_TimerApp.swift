@@ -20,8 +20,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 
-
-
 struct Workout_TimerApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -29,8 +27,6 @@ struct Workout_TimerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-//                .background(workout.isWorkoutActive ? Color(.systemGreen) : Color(.systemBackground))
-//                .edgesIgnoringSafeArea(.all)
         }
     }
 }

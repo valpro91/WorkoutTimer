@@ -6,76 +6,121 @@
 //
 
 import SwiftUI
-import AVFoundation
-import AVFAudio
-import UIKit // Required for UIApplication.shared
 
-//import FirebaseFirestore
-//import FirebaseFirestoreSwift
+struct SectionHeaderTitle: View {
+    var title: String
+    var subtitle: String
+
+       var body: some View {
+           HStack{
+               VStack(alignment: .leading){
+                   Text("\(title) Exercises:")
+                       .foregroundStyle(Color(.black))
+               }
+           }
+       }
+}
+
+
+// Add Workout Overview At the top
+// calculating Number of sets and total time (incl pause times)
+// future describing body parts used 
 
 struct ShowWorkoutScreen: View {
-    @Binding var workout: Workout
-    @State private var setLibrary: [Set] = []
-    @State private var workoutSetArray: [Set] = []
-    @State private var workoutSetRoundsDict: [Set: Int] = [:]
-    
-    @State private var errorMessage: String?
-    
-    // Design Workout Screen
-    // Design DoWorkout Screen
-    // Handle Storage, Saving and Loading globally
-    // split up code in multiple files
+    @StateObject private var viewModel: WorkoutViewModel
+    @State private var isExpanded = true
+        
+    init(workout: Workout) {
+        _viewModel = StateObject(wrappedValue: WorkoutViewModel(workout: workout))
+    }
     
     
-    func matchSetIDsWithSets(workoutDict: [UUID: Int]) -> [Set]{
-        let setIDArray = Array(workoutDict.keys)
-        let workoutSets = setLibrary.filter { set in
-            if workout.sets[set.id] != nil {
-                return true
-            } else {
-                return false
+    var StartWorkoutButton: some View {
+        NavigationLink(destination:
+                        DoSetView(viewModel: DoSetViewModel(workout: LocalWorkout(name: viewModel.workout.name, sets: viewModel.workoutSetRoundsDict, rounds: viewModel.workout.rounds), workoutSetArray: viewModel.workoutSetArray))){
+            HStack{
+                Text("Start Workout")
+                Image(systemName: "play.fill")
             }
         }
-        return workoutSets
     }
     
-    func createSetRoundsDict(workoutSetArray: [Set], workoutDict: [UUID: Int]) -> [Set: Int] {
-        var workoutSetDict: [Set: Int] = [:]
-        for set in workoutSetArray {
-            workoutSetDict[set] = workoutDict[set.id]
-        }
-        return workoutSetDict
-    }
-    
-    var body: some View{
-        NavigationView{
-            VStack{
-                Text(workout.name)
-//                List(workoutSetArray){ set in
-//                    Text("Hello")
-//
-//                }
-                NavigationLink(destination: DoWorkoutScreen(workout: LocalWorkout(name: workout.name, sets: workoutSetRoundsDict ,rounds: workout.rounds), workoutSets: workoutSetArray, currentSet: workoutSetArray.first ?? Set(name: "Default", exercises: [], activeTime: 60, pauseTime: 0))){
-                    Text("Start Workout")
+    func SetRoundsPicker(set: Set) -> some View {
+           Picker("Rounds:", selection: Binding(
+               get: { viewModel.workoutSetRoundsDict[set] ?? 1 },
+               set: { newValue in viewModel.workoutSetRoundsDict[set] = newValue })) {
+               ForEach(1..<7) { rounds in
+                   Text("\(rounds)").tag(rounds)
+               }
+           }
+       }
+
+       func SetTimeSettings(set: Set) -> some View {
+           VStack(alignment: .leading) {
+               Text("\(set.name)")
+                   .font(.title)
+               Picker("Rounds:", selection: Binding(
+                get: { viewModel.workoutSetRoundsDict[set] ?? 1 },
+                set: { newValue in viewModel.workoutSetRoundsDict[set] = newValue })) {
+                    ForEach(1..<7) { rounds in
+                        Text("\(rounds)").tag(rounds)
+                    }
                 }
-            }
-            .onAppear(){
-                print("hello")
-                loadSets { result in
-                    switch result {
-                    case .success(let fetchedSets):
-                        setLibrary = fetchedSets
-                        workoutSetArray = matchSetIDsWithSets(workoutDict: workout.sets)
-                        workoutSetRoundsDict = createSetRoundsDict(workoutSetArray: workoutSetArray, workoutDict: workout.sets)
-                        print("hello")
-                        print(workoutSetArray)
-                        print(workoutSetRoundsDict)
-                    case .failure(let error):
-                        
-                        errorMessage = error.localizedDescription
+               HStack {
+                   Picker("Active Time:", selection: Binding(
+                    get: { set.activeTime },
+                    set: { newValue in
+                        var updatedSet = set
+                        updatedSet.activeTime = newValue
+                        viewModel.updateSet(updatedSet)
+                    })) {
+                        ForEach([15, 30, 45, 60, 75, 90], id: \.self) { activeTime in
+                            Text("\(activeTime)").tag(activeTime)
+                        }
+                    }
+                   
+                   Picker("Pause Time:", selection: Binding(
+                    get: { set.pauseTime },
+                    set: { newValue in
+                        var updatedSet = set
+                        updatedSet.pauseTime = newValue
+                        viewModel.updateSet(updatedSet)
+                    })) {
+                        ForEach([0, 10, 15, 20, 30], id: \.self) { pauseTime in
+                            Text("\(pauseTime)").tag(pauseTime)
+                            }
+                    }
+           }
+       }
+   }
+    
+    var body: some View {
+        NavigationStack {
+            VStack {
+                List{
+                    ForEach(viewModel.workoutSetArray){set in
+                        SetTimeSettings(set: set)
+//                        SetRoundsPicker(set: set)
+//                        SetTimeSettings(set: set)
+                        Section(isExpanded: $isExpanded, content:{
+                            ForEach(set.exercises, id: \.self){ exercise in
+                                Text(exercise)
+                            }},
+                                header:{ SectionHeaderTitle(title: "\(set.name)", subtitle: "\(set.activeTime) sec on, \(set.pauseTime) sec pause")
+                        })
+//                        SetRoundsPicker(set: set)
+//                        SetTimeSettings(set: set)
                     }
                 }
             }
         }
+        .listStyle(.sidebar)
+        .navigationTitle(viewModel.workout.name)
+        .navigationBarItems(trailing: StartWorkoutButton)
+        .onAppear {
+            viewModel.loadData()
+        }
     }
 }
+
+

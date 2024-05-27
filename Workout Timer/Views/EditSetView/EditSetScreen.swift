@@ -8,23 +8,18 @@
 import SwiftUI
 
 struct EditSetScreen: View {
-    @Binding var set: Set
-    @Binding var sets: [Set]
-    @Binding var isNewSet: Bool
-    @State private var savedNewSet: Bool = false
+    @StateObject private var viewModel: EditSetViewModel
     
     @Environment(\.dismiss) var dismiss
-    @State private var exerciseToAdd = ""
-    @State private var renamingWorkout = false
     
-    
-    
-    //try using form  
+    init(set: Binding<Set>, sets: Binding<[Set]>, isNewSet: Binding<Bool>) {
+        _viewModel = StateObject(wrappedValue: EditSetViewModel(set: set.wrappedValue, sets: sets.wrappedValue, isNewSet: isNewSet.wrappedValue))
+    }
     
     var body: some View {
         VStack {
             HStack {
-                TextField(set.name, text: $set.name)
+                TextInputField(viewModel.set.name, text: $viewModel.set.name)
                     .font(.largeTitle)
                     .padding()
             }
@@ -32,75 +27,65 @@ struct EditSetScreen: View {
             Spacer()
             
             HStack {
-                VStack{
+                VStack {
                     Text("Active Time")
-                    Picker("Active Time", selection: $set.activeTime) {
-                        ForEach([15,30,45,60,75,90,120], id: \.self) { time in
+                    Picker("Active Time", selection: $viewModel.set.activeTime) {
+                        ForEach([15, 30, 45, 60, 75, 90, 120], id: \.self) { time in
                             Text("\(time)").tag(time)
                         }
                     }
                     .pickerStyle(.wheel)
                     .frame(height: 75)
-                    
                 }
                 
-                VStack{
+                VStack {
                     Text("Pause Time")
-                    Picker("Pause Time", selection: $set.pauseTime){
-                        ForEach([0,5,10,15,30], id: \.self) { time in
+                    Picker("Pause Time", selection: $viewModel.set.pauseTime) {
+                        ForEach([0, 5, 10, 15, 30], id: \.self) { time in
                             Text("\(time)").tag(time)
                         }
                     }
                     .pickerStyle(.wheel)
                     .frame(height: 75)
                 }
-                
             }
             
             VStack {
                 Text("Exercises")
                 List {
-                    ForEach(set.exercises, id: \.self) { element in
+                    ForEach(viewModel.set.exercises, id: \.self) { element in
                         Text(element)
                     }
                 }
                 .listStyle(.plain)
                 
                 HStack {
-                    TextField("Add Exercise", text: $exerciseToAdd)
+                    TextInputField("Add Exercise", text: $viewModel.exerciseToAdd)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button("Add") {
-                        if !exerciseToAdd.isEmpty {
-                            set.exercises.append(exerciseToAdd)
-                            exerciseToAdd = ""
-                        }
+                        viewModel.addExercise()
                     }
                 }
                 .padding()
             }
             .padding()
             
-            HStack{
+            HStack {
                 Button("Save") {
-                    saveSet(set: set) { result in
+                    viewModel.saveSetToFireBase { result in
                         switch result {
                         case .success():
-                            savedNewSet = true
                             dismiss()
                         case .failure(let error):
                             print("Error saving workout:", error.localizedDescription)
                         }
                     }
                 }
-            
             }
             .padding()
         }
-        .onDisappear(){
-            if (isNewSet == true && savedNewSet == false) {
-                sets.removeLast()
-                isNewSet = false
-            }
+        .onDisappear {
+            viewModel.handleDisappear()
         }
     }
 }
