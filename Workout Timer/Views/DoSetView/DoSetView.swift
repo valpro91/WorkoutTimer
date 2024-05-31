@@ -10,14 +10,14 @@ import SwiftUI
 
 struct DoSetView: View {
     
-    // On Cancel - are you sure dialogue
-    // add initial countdown & Between Set screen
+    // add between Set screen - customize between set pause ?
     
     @StateObject var viewModel: DoSetViewModel
     
     @State var showCancelAlert = false
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.presentationMode) var presentationMode
     
     var CurrentWorkoutName: some View {
         Text(viewModel.workout.name)
@@ -119,6 +119,9 @@ struct DoSetView: View {
         }
         .onDisappear(){
             viewModel.pauseSet()
+        }
+        .onChange(of: viewModel.shouldDismiss, initial: false){
+            dismiss()
         }
     }
 }

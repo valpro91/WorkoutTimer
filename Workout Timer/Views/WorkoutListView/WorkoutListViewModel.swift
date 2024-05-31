@@ -15,7 +15,7 @@ final class SetWorkoutViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     func loadData() {
-        loadSets { result in
+        loadDocuments(collectionName: "sets") { (result: Result<[Set], Error>) in
             switch result {
             case .success(let fetchedSets):
                 self.setLibrary = fetchedSets
@@ -25,8 +25,8 @@ final class SetWorkoutViewModel: ObservableObject {
             }
         }
         
-        loadWorkouts { result in
-            switch result  {
+        loadDocuments(collectionName: "workouts") { (result: Result<[Workout], Error>) in
+            switch result {
             case .success(let fetchedWorkouts):
                 self.workouts = fetchedWorkouts
                 print(self.workouts)

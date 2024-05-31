@@ -7,24 +7,26 @@
 
 import Foundation
 
-class Exercise: Identifiable, Hashable, Equatable, Encodable, Decodable {
+class Exercise: Identifiable, Hashable, Equatable, Encodable, Decodable, FirestoreIdentifiable {
     
     var id: UUID
     var name: String
-    var category: Int
-    var bodyRegion: BodyRegion
+    var category: ExerciseCategory
     var primaryMuscle: Muscle
-    var secondaryMusle: Muscle
-    var description: String
+    var secondaryMuscle: Muscle?
+    var equiptmentNeeded: Bool
+    var description: String?
+    var link: String?
     
-    init(id: UUID, name: String, category: Int, bodyRegion: BodyRegion, primaryMuscle: Muscle, secondaryMusle: Muscle, description: String) {
+    init(id: UUID = UUID(), name: String, category: ExerciseCategory, primaryMuscle: Muscle, secondaryMuscle: Muscle? = nil, equiptmentNeeded: Bool, description: String? = nil, link: String? = nil) {
         self.id = id
         self.name = name
         self.category = category
-        self.bodyRegion = bodyRegion
         self.primaryMuscle = primaryMuscle
-        self.secondaryMusle = secondaryMusle
+        self.secondaryMuscle = secondaryMuscle
+        self.equiptmentNeeded = equiptmentNeeded
         self.description = description
+        self.link = link
     }
     
     func hash(into hasher: inout Hasher) {

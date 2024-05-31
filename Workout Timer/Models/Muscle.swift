@@ -7,13 +7,13 @@
 
 import Foundation
 
-class Muscle : Identifiable, Hashable, Equatable, Encodable, Decodable {
+class Muscle : Identifiable, FirestoreIdentifiable, Hashable, Equatable, Encodable, Decodable {
     
     var id: UUID
     var name: String
     var bodyRegion: BodyRegion
     
-    init(id: UUID, name: String, bodyRegion: BodyRegion) {
+    init(id: UUID = UUID(), name: String, bodyRegion: BodyRegion) {
         self.id = id
         self.name = name
         self.bodyRegion = bodyRegion

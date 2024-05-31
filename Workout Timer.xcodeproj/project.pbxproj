@@ -24,6 +24,12 @@
 		C030EAC52C043847005D6BA5 /* Muscle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EAC42C043847005D6BA5 /* Muscle.swift */; };
 		C030EAC72C043884005D6BA5 /* BodyRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EAC62C043884005D6BA5 /* BodyRegion.swift */; };
 		C030EAC92C0438D0005D6BA5 /* ExerciseCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EAC82C0438D0005D6BA5 /* ExerciseCategory.swift */; };
+		C030EACC2C056C2C005D6BA5 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EACB2C056C2C005D6BA5 /* UserProfileView.swift */; };
+		C030EACE2C056C66005D6BA5 /* UserProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EACD2C056C66005D6BA5 /* UserProfileViewModel.swift */; };
+		C030EAD12C056DF6005D6BA5 /* StreakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EAD02C056DF6005D6BA5 /* StreakView.swift */; };
+		C030EAD32C057398005D6BA5 /* DoneWorkouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EAD22C057398005D6BA5 /* DoneWorkouts.swift */; };
+		C030EAD62C06B377005D6BA5 /* CreateExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EAD52C06B377005D6BA5 /* CreateExerciseView.swift */; };
+		C030EAD82C06B382005D6BA5 /* CreateExerciseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C030EAD72C06B382005D6BA5 /* CreateExerciseViewModel.swift */; };
 		C05C47202BFD88F000E3C28F /* WorkoutListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05C471F2BFD88F000E3C28F /* WorkoutListViewModel.swift */; };
 		C05C47232BFD8C6600E3C28F /* ShowWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05C47222BFD8C6600E3C28F /* ShowWorkoutViewModel.swift */; };
 		C05C47262BFD9BBF00E3C28F /* CreateWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05C47252BFD9BBF00E3C28F /* CreateWorkoutViewModel.swift */; };
@@ -82,6 +88,12 @@
 		C030EAC42C043847005D6BA5 /* Muscle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Muscle.swift; sourceTree = "<group>"; };
 		C030EAC62C043884005D6BA5 /* BodyRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyRegion.swift; sourceTree = "<group>"; };
 		C030EAC82C0438D0005D6BA5 /* ExerciseCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCategory.swift; sourceTree = "<group>"; };
+		C030EACB2C056C2C005D6BA5 /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
+		C030EACD2C056C66005D6BA5 /* UserProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileViewModel.swift; sourceTree = "<group>"; };
+		C030EAD02C056DF6005D6BA5 /* StreakView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakView.swift; sourceTree = "<group>"; };
+		C030EAD22C057398005D6BA5 /* DoneWorkouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneWorkouts.swift; sourceTree = "<group>"; };
+		C030EAD52C06B377005D6BA5 /* CreateExerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateExerciseView.swift; sourceTree = "<group>"; };
+		C030EAD72C06B382005D6BA5 /* CreateExerciseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateExerciseViewModel.swift; sourceTree = "<group>"; };
 		C05C471F2BFD88F000E3C28F /* WorkoutListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutListViewModel.swift; sourceTree = "<group>"; };
 		C05C47222BFD8C6600E3C28F /* ShowWorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowWorkoutViewModel.swift; sourceTree = "<group>"; };
 		C05C47252BFD9BBF00E3C28F /* CreateWorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateWorkoutViewModel.swift; sourceTree = "<group>"; };
@@ -155,9 +167,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C030EACA2C050FD6005D6BA5 /* UserProfileView */ = {
+			isa = PBXGroup;
+			children = (
+				C030EACB2C056C2C005D6BA5 /* UserProfileView.swift */,
+				C030EACD2C056C66005D6BA5 /* UserProfileViewModel.swift */,
+			);
+			path = UserProfileView;
+			sourceTree = "<group>";
+		};
+		C030EACF2C056DEB005D6BA5 /* Streak */ = {
+			isa = PBXGroup;
+			children = (
+				C030EAD02C056DF6005D6BA5 /* StreakView.swift */,
+			);
+			path = Streak;
+			sourceTree = "<group>";
+		};
+		C030EAD42C06B366005D6BA5 /* CreateExerciseView */ = {
+			isa = PBXGroup;
+			children = (
+				C030EAD52C06B377005D6BA5 /* CreateExerciseView.swift */,
+				C030EAD72C06B382005D6BA5 /* CreateExerciseViewModel.swift */,
+			);
+			path = CreateExerciseView;
+			sourceTree = "<group>";
+		};
 		C05C471B2BFD886200E3C28F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C030EAD42C06B366005D6BA5 /* CreateExerciseView */,
+				C030EACF2C056DEB005D6BA5 /* Streak */,
+				C030EACA2C050FD6005D6BA5 /* UserProfileView */,
 				C05C47322C00272C00E3C28F /* DoSetView */,
 				C05C471E2BFD88D800E3C28F /* WorkoutListView */,
 				C0603A572BDECB4600E483B9 /* ContentView.swift */,
@@ -183,6 +224,7 @@
 				C030EAC62C043884005D6BA5 /* BodyRegion.swift */,
 				C030EAC22C04368E005D6BA5 /* User.swift */,
 				C030EAC42C043847005D6BA5 /* Muscle.swift */,
+				C030EAD22C057398005D6BA5 /* DoneWorkouts.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -479,11 +521,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C030EAD82C06B382005D6BA5 /* CreateExerciseViewModel.swift in Sources */,
 				C030EAC72C043884005D6BA5 /* BodyRegion.swift in Sources */,
 				C097A3992BFA46C900C19CA5 /* Workout.swift in Sources */,
 				C05C47312BFED4D000E3C28F /* SoundFunctions.swift in Sources */,
 				C097A3B52BFB991500C19CA5 /* ToDoList.swift in Sources */,
 				C05C47262BFD9BBF00E3C28F /* CreateWorkoutViewModel.swift in Sources */,
+				C030EAD32C057398005D6BA5 /* DoneWorkouts.swift in Sources */,
 				C097A3B12BFB70F500C19CA5 /* ReusableTextImputField.swift in Sources */,
 				C097A3A92BFA488300C19CA5 /* SetListScreen.swift in Sources */,
 				C05C47232BFD8C6600E3C28F /* ShowWorkoutViewModel.swift in Sources */,
@@ -494,13 +538,16 @@
 				C030EAB62C0428A3005D6BA5 /* Exercise.swift in Sources */,
 				C05C47292BFE7CE300E3C28F /* EditSetViewModel.swift in Sources */,
 				C05C472C2BFE831000E3C28F /* SetListViewModel.swift in Sources */,
+				C030EAD12C056DF6005D6BA5 /* StreakView.swift in Sources */,
 				C097A39F2BFA476300C19CA5 /* FirebaseFunctions.swift in Sources */,
 				C097A39B2BFA471200C19CA5 /* Set.swift in Sources */,
+				C030EACE2C056C66005D6BA5 /* UserProfileViewModel.swift in Sources */,
 				C05C472E2BFE83FD00E3C28F /* DoWorkoutViewModel.swift in Sources */,
 				C05C47362C00274900E3C28F /* DoSetViewModel.swift in Sources */,
 				C030EAC92C0438D0005D6BA5 /* ExerciseCategory.swift in Sources */,
 				C097A3AD2BFA48B600C19CA5 /* DoWorkoutScreen.swift in Sources */,
 				C097A3AF2BFA48E000C19CA5 /* WorkoutListScreen.swift in Sources */,
+				C030EACC2C056C2C005D6BA5 /* UserProfileView.swift in Sources */,
 				C097A3A12BFA479C00C19CA5 /* LocalWorkout.swift in Sources */,
 				C097A3A72BFA485F00C19CA5 /* CreateWorkoutScreen.swift in Sources */,
 				C097A39D2BFA472900C19CA5 /* ShowWorkoutScreen.swift in Sources */,
@@ -509,6 +556,7 @@
 				C08E5B392BE323EB00E474E1 /* Exercise_editor.swift in Sources */,
 				C0603A562BDECB4600E483B9 /* Workout_TimerApp.swift in Sources */,
 				C05C47202BFD88F000E3C28F /* WorkoutListViewModel.swift in Sources */,
+				C030EAD62C06B377005D6BA5 /* CreateExerciseView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

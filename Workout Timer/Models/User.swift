@@ -7,7 +7,7 @@
 
 import Foundation
 
-class User: Identifiable, Hashable, Equatable, Encodable, Decodable {
+class User: Identifiable, FirestoreIdentifiable, Hashable, Equatable, Encodable, Decodable {
     
     var id: UUID
     var firstname: String
@@ -15,11 +15,12 @@ class User: Identifiable, Hashable, Equatable, Encodable, Decodable {
     var sex: String
     var workouts: [UUID] = []
     
-    init(id: UUID, firstname: String, lastname: String, sex: String, workouts: [UUID]) {
+    init(id: UUID = UUID(), firstname: String, lastname: String, sex: String, workouts: [UUID]) {
         self.id = id
         self.firstname = firstname
         self.lastname = lastname
         self.sex = sex
+        self.workouts = workouts
     }
     
     func hash(into hasher: inout Hasher) {

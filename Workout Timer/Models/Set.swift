@@ -10,7 +10,7 @@ import Foundation
 // adding the body parts that the sets use
 // prepare for making exercises their own class with description - how to 
 
-class Set: Identifiable, Hashable, Equatable, Encodable, Decodable {
+class Set: Identifiable, Hashable, Equatable, Encodable, Decodable, FirestoreIdentifiable {
     var id: UUID
     var name: String
     var exercises: [String] = []

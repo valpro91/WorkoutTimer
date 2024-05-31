@@ -17,7 +17,7 @@ final class SetListViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     func loadData() {
-        loadSets { result in
+        loadDocuments(collectionName: "sets") { (result: Result<[Set], Error>) in
             switch result {
             case .success(let fetchedSets):
                 self.sets = fetchedSets

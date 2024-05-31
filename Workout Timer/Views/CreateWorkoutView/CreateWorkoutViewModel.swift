@@ -23,7 +23,7 @@ final class CreateWorkoutViewModel: ObservableObject {
     
     func saveNewWorkout(name: String, workoutSetDict: [UUID: Int], rounds: Int) {
         let workoutToSave = Workout(name: name, sets: workoutSetDict, rounds: rounds)
-        saveWorkout(workout: workoutToSave){ result in
+        saveDocument(document: workoutToSave, collectionName: "workouts"){ result in
             switch result {
             case .success():
                 break
@@ -35,7 +35,7 @@ final class CreateWorkoutViewModel: ObservableObject {
     }
     
     func loadData() {
-        loadSets { result in
+        loadDocuments(collectionName: "sets") { (result: Result<[Set], Error>) in
             switch result {
             case .success(let fetchedSets):
                 self.sets = fetchedSets

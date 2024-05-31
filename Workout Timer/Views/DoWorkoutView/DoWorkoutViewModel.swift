@@ -113,6 +113,7 @@ class DoWorkoutViewModel: ObservableObject {
                     currentExercise = 0
                     currentRound += 1
                     if currentRound >= localRounds {
+                        print("Streak +1")
                         playTone("complete")
                         resetWorkout()
                         return

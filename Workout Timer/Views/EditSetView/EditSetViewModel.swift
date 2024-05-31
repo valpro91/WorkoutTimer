@@ -31,7 +31,7 @@ class EditSetViewModel: ObservableObject {
     }
     
     func saveSetToFireBase(completion: @escaping (Result<Void, Error>) -> Void) {
-        saveSet(set: set) { result in
+        saveDocument(document: set, collectionName: "sets") { result in
             switch result {
             case .success():
                 self.savedNewSet = true

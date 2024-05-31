@@ -59,7 +59,7 @@ struct SetListScreen: View {
                     }
                     
                     Button("Add New Set", systemImage: "plus.circle", action: {
-                        let newSet = Set(name: "New Workout", exercises: [], activeTime: 0, pauseTime: 0)
+                        let newSet = Set(name: "", exercises: [], activeTime: 0, pauseTime: 0)
                         viewModel.sets.append(newSet)
                         viewModel.selectedSet = newSet
                         viewModel.showingEditScreen = true

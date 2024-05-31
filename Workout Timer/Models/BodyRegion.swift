@@ -7,12 +7,12 @@
 
 import Foundation
 
-class BodyRegion : Identifiable, Hashable, Equatable, Encodable, Decodable {
+class BodyRegion : Identifiable, FirestoreIdentifiable, Hashable, Equatable, Encodable, Decodable {
     
     var id: UUID
     var name: String
     
-    init(id: UUID, name: String) {
+    init(id: UUID = UUID(), name: String) {
         self.id = id
         self.name = name
     }

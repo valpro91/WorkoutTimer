@@ -19,7 +19,7 @@ struct EditSetScreen: View {
     var body: some View {
         VStack {
             HStack {
-                TextInputField(viewModel.set.name, text: $viewModel.set.name)
+                TextField("Set Name", text: $viewModel.set.name)
                     .font(.largeTitle)
                     .padding()
             }
@@ -60,7 +60,7 @@ struct EditSetScreen: View {
                 .listStyle(.plain)
                 
                 HStack {
-                    TextInputField("Add Exercise", text: $viewModel.exerciseToAdd)
+                    TextField("Add Exercise", text: $viewModel.exerciseToAdd)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button("Add") {
                         viewModel.addExercise()

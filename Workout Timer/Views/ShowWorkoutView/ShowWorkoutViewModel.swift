@@ -16,7 +16,7 @@ class WorkoutViewModel: ObservableObject {
 
     func loadData() {
         // Assume this is an asynchronous function
-        loadSets() { result in
+        loadDocuments(collectionName: "sets") { (result: Result<[Set], Error>) in
             switch result {
             case .success(let fetchedSets):
                 self.setLibrary = fetchedSets

@@ -34,6 +34,7 @@ class DoSetViewModel: ObservableObject {
     @Published var countDownTime = 5
     
     @Published var showCountDownOverlay = true
+    @Published var shouldDismiss = false
     
     private var audioPlayer: AVAudioPlayer?
     private var speechSynthesizer = AVSpeechSynthesizer()
@@ -127,8 +128,13 @@ class DoSetViewModel: ObservableObject {
                     currentRound += 1
                     if currentRound >= localRounds {
                         playTone("complete")
-                        nextSet()
-                        return
+                        if setCounter+1 < setArray.count {
+                            nextSet()
+                        } else {
+                            print("Streak +1")
+                            shouldDismiss = true
+                            return
+                        }
                     }
                 }
             } else {

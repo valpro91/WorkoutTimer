@@ -8,10 +8,13 @@
 import Foundation
 
 
-class Workout: Identifiable, Hashable, Equatable, Encodable, Decodable {
+class Workout: Identifiable, Hashable, Equatable, Encodable, Decodable, FirestoreIdentifiable {
     var id: UUID // This field will be used for hashing
     var name: String
+//    var warmup: String
+//    var finisher: String
     var sets: [UUID: Int]
+
     var rounds: Int
     
     init(id: UUID = UUID(), name: String, sets: [UUID: Int], rounds: Int) {

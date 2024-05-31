@@ -14,16 +14,31 @@ import Foundation
 
 // separate logic from view with ViewModels -> https://www.youtube.com/watch?v=FwGMU_Grnf8
 
-// move away from MVVM? - https://blog.stackademic.com/removing-the-m-from-mvvm-with-swiftui-a58b239e9e3e
+// implement:
+
+// Make create Set - User etc a Form 
+
+// Figure out data structure with IDs and so on
+
+//https://chatgpt.com/share/51638bb7-e62e-4e6c-963b-94eab7aa2310
+
+// Workout Segments: warm up, finisher
+
+// create Workout Calendar or weekly routine workout planning - overview of what muscle regions are covered with the routine
+
+// STATS
+// 1. Workout Counter ( Finished Workout congratulation screen and adding counter )
+// 2. Daily Reminder
+// 3. Stats page (Workout + Set Roudns, Workout Rounds Stored separately)
+
+
 
 // Sound of Software - https://www.notboring.software/words/the-sound-of-software
 
 // implement @observable everywhere -> https://www.youtube.com/watch?v=EK7SthdWV2w
 
-
-
-// Integrate CoreData data management
 // Write Tests for the all the app functionality
+
 // Refactor as much as possible
 //      Extract Subview -> for reused elements of the UI
 //      Extract Local Subview -> when you need to access properties of the parent view

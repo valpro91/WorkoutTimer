@@ -15,7 +15,7 @@ struct SectionHeaderTitle: View {
            HStack{
                VStack(alignment: .leading){
                    Text("\(title) Exercises:")
-                       .foregroundStyle(Color(.black))
+                       .foregroundStyle(.primary)
                }
            }
        }
@@ -108,6 +108,7 @@ struct ShowWorkoutScreen: View {
                             }},
                                 header:{ SectionHeaderTitle(title: "\(set.name)", subtitle: "\(set.activeTime) sec on, \(set.pauseTime) sec pause")
                         })
+
 //                        SetRoundsPicker(set: set)
 //                        SetTimeSettings(set: set)
                     }
